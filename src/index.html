@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ritmo Diário ⚡</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Definindo as fontes no Tailwind */
+        .font-anton {
+            font-family: 'Anton', sans-serif;
+        }
+        .font-inter {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Cores personalizadas para fácil acesso (opcional, Tailwind permite JIT) */
+        :root {
+            --color-primary-dark: #4a0094;
+            --color-primary-medium: #7600ad;
+            --color-accent: #ffb545;
+            --color-white: #ffffff;
+            --color-black: #000000;
+        }
+
+        /* Estilos para os exemplos de componentes */
+        .custom-button {
+            transition: all 0.3s ease;
+        }
+        .custom-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .custom-card { /* Mantido para consistência, embora não seja usado diretamente aqui */
+            transition: all 0.3s ease;
+        }
+        .custom-card:hover { /* Mantido para consistência, embora não seja usado diretamente aqui */
+            transform: scale(1.03);
+        }
+
+        /* Estilos específicos da aplicação */
+        body {
+            background-color: #f3f4f6; /* Cor de fundo suave do padrão de design */
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Garante que o body ocupe a altura total da viewport */
+            font-family: 'Inter', sans-serif; /* Fonte principal do padrão de design */
+            color: #374151; /* text-gray-800 do padrão de design */
+        }
+        /* Estilos para a barra de rolagem personalizada */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e0e0e0;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #9ca3af;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+        }
+        /* Estilo para tarefas concluídas */
+        .completed {
+            text-decoration: line-through;
+            color: #6b7280; /* Cinza para tarefas concluídas */
+            opacity: 0.7;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-dark': '#4a0094',
+                        'primary-medium': '#7600ad',
+                        'accent': '#ffb545',
+                    },
+                    fontFamily: {
+                        'anton': ['Anton', 'sans-serif'],
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    backgroundImage: {
+                        'custom-gradient': 'linear-gradient(to right, #4a0094, #7600ad)',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="antialiased font-inter text-gray-800">
+    <header class="bg-custom-gradient text-white p-6 shadow-lg text-center md:p-8 relative">
+        <div class="container mx-auto">
+            <div class="flex items-center justify-center gap-3">
+                <h1 class="font-anton text-5xl md:text-6xl tracking-wider" id="appTitle">
+                    Ritmo Diário
+                </h1>
+                <span class="text-6xl md:text-7xl">⚡</span>
+            </div>
+            <p class="font-inter mt-2 text-xl md:text-2xl" id="appSubtitle">Organize suas tarefas diárias de forma simples e eficiente.</p>
+        </div>
+        <div class="absolute top-4 right-4 md:top-8 md:right-8 z-10"> <select id="languageSwitcher" class="custom-button bg-primary-medium hover:bg-primary-dark text-white font-semibold py-2 px-4 rounded-lg shadow-md cursor-pointer">
+                <option value="pt-BR">Português</option>
+                <option value="en-US">English</option>
+            </select>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto p-6 md:p-8">
+        <div class="bg-white rounded-xl shadow-2xl p-6 md:p-8 max-w-2xl mx-auto">
+            <h2 class="font-anton text-3xl md:text-4xl text-primary-dark mb-6 border-b-2 border-accent pb-3" id="addTaskTitle">Adicionar Nova Tarefa</h2>
+            <div class="flex flex-col sm:flex-row gap-4 mb-6">
+                <input type="text" id="taskInput" placeholder="Digite uma nova tarefa..."
+                       class="flex-grow p-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-4 focus:ring-accent text-lg font-inter shadow-sm">
+                <button id="addTaskBtn"
+                        class="custom-button font-inter font-bold text-white bg-primary-medium hover:bg-primary-dark py-3 px-6 rounded-lg shadow-md">
+                    Adicionar Tarefa
+                </button>
+            </div>
+
+            <h2 class="font-anton text-3xl md:text-4xl text-primary-dark mb-4 border-b-2 border-accent pb-3" id="myTasksTitle">Minhas Tarefas</h2>
+            <ul id="taskList" class="space-y-3">
+                </ul>
+
+            <div class="mt-8 text-center">
+                <button id="clearAllBtn"
+                        class="custom-button font-inter font-bold text-white bg-red-600 hover:bg-red-700 py-3 px-6 rounded-lg shadow-md">
+                    Limpar Todas as Tarefas
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-primary-dark text-white text-center p-4 mt-8">
+        <p class="font-inter text-sm" id="footerText">© <span id="currentYear"></span> Ritmo Diário. Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        // Referências aos elementos do DOM
+        const taskInput = document.getElementById('taskInput');
+        const addTaskBtn = document.getElementById('addTaskBtn');
+        const taskList = document.getElementById('taskList');
+        const clearAllBtn = document.getElementById('clearAllBtn');
+        const currentYearSpan = document.getElementById('currentYear');
+        const languageSwitcher = document.getElementById('languageSwitcher');
+
+        // Elementos de texto que serão traduzidos
+        const appTitleElement = document.getElementById('appTitle');
+        const appSubtitleElement = document.getElementById('appSubtitle');
+        const addTaskTitleElement = document.getElementById('addTaskTitle');
+        const myTasksTitleElement = document.getElementById('myTasksTitle');
+        const footerTextElement = document.getElementById('footerText');
+
+        // Define o ano atual no rodapé
+        currentYearSpan.textContent = new Date().getFullYear();
+
+        // Objeto de traduções
+        const translations = {
+            'pt-BR': {
+                appTitle: 'Ritmo Diário',
+                appSubtitle: 'Organize suas tarefas diárias de forma simples e eficiente.',
+                addTaskTitle: 'Adicionar Nova Tarefa',
+                taskInputPlaceholder: 'Digite uma nova tarefa...',
+                addTaskButton: 'Adicionar Tarefa',
+                myTasksTitle: 'Minhas Tarefas',
+                clearAllButton: 'Limpar Todas as Tarefas',
+                confirmClearTitle: 'Tem certeza que deseja limpar todas as tarefas?',
+                confirmClearYes: 'Sim',
+                confirmClearNo: 'Não',
+                deleteTaskTitle: 'Excluir Tarefa',
+                emptyTaskMessage: 'Por favor, digite uma tarefa.'
+            },
+            'en-US': {
+                appTitle: 'Daily Rhythm',
+                appSubtitle: 'Organize your daily tasks simply and efficiently.',
+                addTaskTitle: 'Add New Task',
+                taskInputPlaceholder: 'Enter a new task...',
+                addTaskButton: 'Add Task',
+                myTasksTitle: 'My Tasks',
+                clearAllButton: 'Clear All Tasks',
+                confirmClearTitle: 'Are you sure you want to clear all tasks?',
+                confirmClearYes: 'Yes',
+                confirmClearNo: 'No',
+                deleteTaskTitle: 'Delete Task',
+                emptyTaskMessage: 'Please enter a task.'
+            }
+        };
+
+        // Função para atualizar o texto da UI com base no idioma selecionado
+        function updateUI(lang) {
+            appTitleElement.textContent = translations[lang].appTitle;
+            appSubtitleElement.textContent = translations[lang].appSubtitle;
+            addTaskTitleElement.textContent = translations[lang].addTaskTitle;
+            taskInput.placeholder = translations[lang].taskInputPlaceholder;
+            addTaskBtn.textContent = translations[lang].addTaskButton;
+            myTasksTitleElement.textContent = translations[lang].myTasksTitle;
+            clearAllBtn.textContent = translations[lang].clearAllButton;
+            // Atualiza o texto do rodapé, mantendo o ano dinâmico
+            footerTextElement.innerHTML = `© <span id="currentYear">${new Date().getFullYear()}</span> ${translations[lang].appTitle}. ${lang === 'pt-BR' ? 'Todos os direitos reservados.' : 'All rights reserved.'}`;
+        }
+
+        // Função para carregar tarefas do Local Storage
+        function loadTasks() {
+            // Tenta obter as tarefas do localStorage. Se não houver, retorna um array vazio.
+            const tasks = JSON.parse(localStorage.getItem('dailyTasks')) || [];
+            // Limpa a lista atual antes de carregar
+            taskList.innerHTML = '';
+            // Itera sobre cada tarefa e a adiciona à lista no DOM
+            tasks.forEach(task => addTaskToDOM(task.text, task.completed));
+        }
+
+        // Função para salvar tarefas no Local Storage
+        function saveTasks() {
+            const tasks = [];
+            // Itera sobre cada item da lista de tarefas no DOM
+            taskList.querySelectorAll('li').forEach(li => {
+                // Adiciona o texto da tarefa e seu status de conclusão ao array
+                tasks.push({
+                    text: li.querySelector('span').textContent,
+                    completed: li.classList.contains('completed')
+                });
+            });
+            // Salva o array de tarefas como uma string JSON no localStorage
+            localStorage.setItem('dailyTasks', JSON.stringify(tasks));
+        }
+
+        // Função para adicionar uma tarefa ao DOM
+        function addTaskToDOM(taskText, isCompleted = false) {
+            // Cria um novo elemento de lista (li)
+            const li = document.createElement('li');
+            // Adiciona classes Tailwind para estilização do item da lista
+            li.className = 'flex items-center justify-between bg-gray-50 p-5 rounded-lg shadow-md border border-gray-300 transition duration-200 ease-in-out hover:bg-gray-100';
+
+            // Cria um elemento span para o texto da tarefa
+            const taskSpan = document.createElement('span');
+            taskSpan.textContent = taskText;
+            taskSpan.className = 'flex-grow text-xl text-gray-800 cursor-pointer font-inter'; // Torna o texto clicável para marcar/desmarcar
+
+            // Se a tarefa estiver concluída, adiciona a classe 'completed'
+            if (isCompleted) {
+                li.classList.add('completed'); // Aplica a classe 'completed' para riscar o texto
+            }
+
+            // Adiciona um listener de clique para marcar/desmarcar a tarefa
+            taskSpan.addEventListener('click', () => {
+                li.classList.toggle('completed'); // Alterna a classe 'completed'
+                saveTasks(); // Salva o estado atualizado das tarefas
+            });
+
+            // Cria um contêiner para os botões de ação
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'flex items-center gap-2 ml-4'; // Adiciona margem à esquerda para separar do texto
+
+            // Botão de exclusão
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = '🗑️'; // Emoji de lixeira
+            deleteBtn.title = translations[languageSwitcher.value].deleteTaskTitle; // Dica de ferramenta traduzida
+            deleteBtn.className = 'text-red-600 hover:text-red-800 p-3 rounded-full transition duration-200 ease-in-out transform hover:scale-110';
+            // Adiciona um listener de clique para excluir a tarefa
+            deleteBtn.addEventListener('click', () => {
+                li.remove(); // Remove o item da lista do DOM
+                saveTasks(); // Salva o estado atualizado das tarefas
+            });
+
+            // Adiciona o span do texto e o botão de exclusão ao item da lista
+            li.appendChild(taskSpan);
+            actionsDiv.appendChild(deleteBtn);
+            li.appendChild(actionsDiv);
+
+            // Adiciona o item da lista à lista de tarefas no DOM
+            taskList.appendChild(li);
+        }
+
+        // Função para adicionar uma nova tarefa
+        function addTask() {
+            const taskText = taskInput.value.trim(); // Obtém o texto do input e remove espaços em branco
+
+            // Verifica se o input não está vazio
+            if (taskText !== '') {
+                addTaskToDOM(taskText); // Adiciona a tarefa ao DOM
+                saveTasks(); // Salva a nova tarefa no Local Storage
+                taskInput.value = ''; // Limpa o campo de input
+            } else {
+                // Mensagem de erro ou feedback visual se o input estiver vazio
+                console.log(translations[languageSwitcher.value].emptyTaskMessage);
+            }
+        }
+
+        // Função para limpar todas as tarefas
+        function clearAllTasks() {
+            const currentLang = languageSwitcher.value; // Obtém o idioma atual
+
+            // Usando um modal simples em vez de alert()
+            const confirmClear = document.createElement('div');
+            confirmClear.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            confirmClear.innerHTML = `
+                <div class="bg-white p-8 rounded-lg shadow-xl text-center max-w-sm mx-auto">
+                    <p class="text-xl font-semibold mb-6 text-gray-800 font-inter">${translations[currentLang].confirmClearTitle}</p>
+                    <div class="flex justify-center gap-4">
+                        <button id="confirmYes" class="custom-button bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-5 rounded-lg">${translations[currentLang].confirmClearYes}</button>
+                        <button id="confirmNo" class="custom-button bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-5 rounded-lg">${translations[currentLang].confirmClearNo}</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(confirmClear);
+
+            document.getElementById('confirmYes').addEventListener('click', () => {
+                taskList.innerHTML = ''; // Remove todos os itens da lista do DOM
+                localStorage.removeItem('dailyTasks'); // Remove todas as tarefas do Local Storage
+                confirmClear.remove(); // Remove o modal de confirmação
+            });
+
+            document.getElementById('confirmNo').addEventListener('click', () => {
+                confirmClear.remove(); // Remove o modal de confirmação
+            });
+        }
+
+        // Event Listeners
+        // Adicionar tarefa ao clicar no botão
+        addTaskBtn.addEventListener('click', addTask);
+
+        // Adicionar tarefa ao pressionar Enter no campo de input
+        taskInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                addTask();
+            }
+        });
+
+        // Limpar todas as tarefas ao clicar no botão
+        clearAllBtn.addEventListener('click', clearAllTasks);
+
+        // Listener para o seletor de idioma
+        languageSwitcher.addEventListener('change', (event) => {
+            const selectedLang = event.target.value;
+            localStorage.setItem('appLanguage', selectedLang); // Salva a preferência de idioma
+            updateUI(selectedLang); // Atualiza a UI
+            // Recarrega as tarefas para garantir que as dicas de ferramenta e mensagens internas estejam no idioma correto
+            loadTasks();
+        });
+
+        // Carregar idioma salvo ou definir padrão
+        function setInitialLanguage() {
+            const savedLang = localStorage.getItem('appLanguage');
+            if (savedLang && translations[savedLang]) {
+                languageSwitcher.value = savedLang;
+            } else {
+                languageSwitcher.value = 'pt-BR'; // Idioma padrão
+            }
+            updateUI(languageSwitcher.value);
+        }
+
+        // Carregar tarefas e definir idioma quando a página é carregada
+        window.onload = () => {
+            setInitialLanguage();
+            loadTasks();
+        };
+    </script>
+</body>
+</html>
