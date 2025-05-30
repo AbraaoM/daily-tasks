@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ritmo Diário ⚡</title>
+    <title>Run ⚡</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -101,7 +101,7 @@
         <div class="container mx-auto">
             <div class="flex items-center justify-center gap-3">
                 <h1 class="font-anton text-5xl md:text-6xl tracking-wider" id="appTitle">
-                    Ritmo Diário
+                    Run
                 </h1>
                 <span class="text-6xl md:text-7xl">⚡</span>
             </div>
@@ -140,7 +140,11 @@
     </main>
 
     <footer class="bg-primary-dark text-white text-center p-4 mt-8">
-        <p class="font-inter text-sm" id="footerText">© <span id="currentYear"></span> Ritmo Diário. Todos os direitos reservados.</p>
+        <p class="font-inter text-sm" id="footerText">© <span id="currentYear"></span> 
+            <a href="http://abraaomoreira.dev">
+                Abraão Moreira
+            </a>. 
+        Todos os direitos reservados.</p>
     </footer>
 
     <script>
@@ -165,7 +169,7 @@
         // Objeto de traduções
         const translations = {
             'pt-BR': {
-                appTitle: 'Ritmo Diário',
+                appTitle: 'Run',
                 appSubtitle: 'Organize suas tarefas diárias de forma simples e eficiente.',
                 addTaskTitle: 'Adicionar Nova Tarefa',
                 taskInputPlaceholder: 'Digite uma nova tarefa...',
@@ -179,7 +183,7 @@
                 emptyTaskMessage: 'Por favor, digite uma tarefa.'
             },
             'en-US': {
-                appTitle: 'Daily Rhythm',
+                appTitle: 'Run',
                 appSubtitle: 'Organize your daily tasks simply and efficiently.',
                 addTaskTitle: 'Add New Task',
                 taskInputPlaceholder: 'Enter a new task...',
@@ -204,7 +208,7 @@
             myTasksTitleElement.textContent = translations[lang].myTasksTitle;
             clearAllBtn.textContent = translations[lang].clearAllButton;
             // Atualiza o texto do rodapé, mantendo o ano dinâmico
-            footerTextElement.innerHTML = `© <span id="currentYear">${new Date().getFullYear()}</span> ${translations[lang].appTitle}. ${lang === 'pt-BR' ? 'Todos os direitos reservados.' : 'All rights reserved.'}`;
+            footerTextElement.innerHTML = `© <span id="currentYear">${new Date().getFullYear()}</span> <a href="http://abraaomoreira.dev"> Abraão Moreira</a>.  ${lang === 'pt-BR' ? 'Todos os direitos reservados.' : 'All rights reserved.'}`;
         }
 
         // Função para carregar tarefas do Local Storage
