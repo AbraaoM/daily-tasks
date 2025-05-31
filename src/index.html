@@ -242,6 +242,7 @@
             const li = document.createElement('li');
             // Adiciona classes Tailwind para estilização do item da lista
             li.className = 'flex items-center justify-between bg-gray-50 p-5 rounded-lg shadow-md border border-gray-300 transition duration-200 ease-in-out hover:bg-gray-100';
+            li.draggable = true; // Permite arrastar
 
             // Cria um elemento span para o texto da tarefa
             const taskSpan = document.createElement('span');
@@ -278,6 +279,46 @@
             li.appendChild(taskSpan);
             actionsDiv.appendChild(deleteBtn);
             li.appendChild(actionsDiv);
+
+            // --- Drag and Drop Events ---
+            li.addEventListener('dragstart', (e) => {
+                li.classList.add('opacity-50');
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', null); // Necessário para Firefox
+                li.setAttribute('data-dragging', 'true');
+            });
+
+            li.addEventListener('dragend', () => {
+                li.classList.remove('opacity-50');
+                li.removeAttribute('data-dragging');
+            });
+
+            li.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                li.classList.add('ring-2', 'ring-accent');
+            });
+
+            li.addEventListener('dragleave', () => {
+                li.classList.remove('ring-2', 'ring-accent');
+            });
+
+            li.addEventListener('drop', (e) => {
+                e.preventDefault();
+                li.classList.remove('ring-2', 'ring-accent');
+                const dragging = taskList.querySelector('li[data-dragging="true"]');
+                if (dragging && dragging !== li) {
+                    // Insere o item arrastado antes ou depois, dependendo da posição
+                    const rect = li.getBoundingClientRect();
+                    const offset = e.clientY - rect.top;
+                    if (offset < rect.height / 2) {
+                        taskList.insertBefore(dragging, li);
+                    } else {
+                        taskList.insertBefore(dragging, li.nextSibling);
+                    }
+                    saveTasks();
+                }
+            });
+            // --- Fim Drag and Drop ---
 
             // Adiciona o item da lista à lista de tarefas no DOM
             taskList.appendChild(li);
