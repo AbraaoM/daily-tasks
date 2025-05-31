@@ -316,6 +316,8 @@
                 draggingElem = li;
                 li.classList.add('opacity-50');
                 li.setAttribute('data-dragging', 'true');
+                // Bloqueia o scroll da página durante o drag
+                document.body.style.overflow = 'hidden';
             }, { passive: true });
 
             li.addEventListener('touchmove', (e) => {
@@ -332,6 +334,8 @@
                         taskList.insertBefore(draggingElem, targetLi.nextSibling);
                     }
                 }
+                // Impede o scroll da página durante o drag
+                e.preventDefault();
             }, { passive: false });
 
             li.addEventListener('touchend', () => {
@@ -342,6 +346,8 @@
                     saveTasks();
                 }
                 touchStartY = null;
+                // Libera o scroll da página após o drag
+                document.body.style.overflow = '';
             });
             // --- Fim Touch Events ---
 
