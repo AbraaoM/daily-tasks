@@ -268,7 +268,7 @@
             li.appendChild(taskSpan);
             li.appendChild(actionsDiv);
 
-            // --- Drag and Drop Events ---
+            // --- Drag and Drop Events (Desktop) ---
             li.addEventListener('dragstart', (e) => {
                 li.classList.add('opacity-50');
                 e.dataTransfer.effectAllowed = 'move';
@@ -306,6 +306,44 @@
                 }
             });
             // --- Fim Drag and Drop ---
+
+            // --- Touch Events for Mobile Drag and Drop ---
+            let touchStartY = null;
+            let draggingElem = null;
+
+            li.addEventListener('touchstart', (e) => {
+                touchStartY = e.touches[0].clientY;
+                draggingElem = li;
+                li.classList.add('opacity-50');
+                li.setAttribute('data-dragging', 'true');
+            }, { passive: true });
+
+            li.addEventListener('touchmove', (e) => {
+                if (!draggingElem) return;
+                const touch = e.touches[0];
+                const elem = document.elementFromPoint(touch.clientX, touch.clientY);
+                if (elem && elem.closest('li') && elem.closest('li') !== draggingElem) {
+                    const targetLi = elem.closest('li');
+                    const rect = targetLi.getBoundingClientRect();
+                    const offset = touch.clientY - rect.top;
+                    if (offset < rect.height / 2) {
+                        taskList.insertBefore(draggingElem, targetLi);
+                    } else {
+                        taskList.insertBefore(draggingElem, targetLi.nextSibling);
+                    }
+                }
+            }, { passive: false });
+
+            li.addEventListener('touchend', () => {
+                if (draggingElem) {
+                    draggingElem.classList.remove('opacity-50');
+                    draggingElem.removeAttribute('data-dragging');
+                    draggingElem = null;
+                    saveTasks();
+                }
+                touchStartY = null;
+            });
+            // --- Fim Touch Events ---
 
             taskList.appendChild(li);
         }
